@@ -7,6 +7,7 @@
 *.xlsx
 *.xlx
 *.csv
+team_files
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
