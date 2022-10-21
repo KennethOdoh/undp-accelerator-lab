@@ -4,10 +4,6 @@
 #Other Files
 *.pdf
 *.jpg
-*.xlsx
-*.xlx
-*.csv
-!energy_data_cleaned.csv
 team_files
 
 ### Python ###
