@@ -239,10 +239,7 @@ wordcloud = WordCloud(stopwords=STOPWORDS,
                      random_state=42,
                      color_func=similar_color)
 wordcloud.generate(list_of_tags)
-plt.figure(figsize=(10,10))
-plt.imshow(wordcloud, interpolation='None',)
-plt.axis('off')
-plt.savefig('wordcloud.png', bbox_inches = 'tight')
+wordcloud = wordcloud.to_file("wordcloud.png")
 
 col_7, col_8, col_9 = st.columns([1,2,1])
 with col_7:
