@@ -1,6 +1,7 @@
 # Importing Packages
 from cProfile import label
 from inspect import stack
+from turtle import color
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -107,7 +108,7 @@ with col_1:
     fig_country_count = px.bar(energy_data, 
         x=energy_data['Country'].value_counts(sort=True, ascending = True),
         y=energy_data['Country'].value_counts(sort=True, ascending = True).index,
-        title="<b>Distribution of Solutions by Country (Top 20)</b>",
+        title="<b>Distribution of Solutions by Country</b>",
         width = 450,
         height = 500,
         range_x=[0, 51],
@@ -120,7 +121,7 @@ with col_1:
 with col_2:
     col_2_expander = st.expander('Distribution of Solutions Per Region', expanded=True)
     with col_2_expander:
-        st.write('By regional destribution, the Regional Bureau for Africa (RBA) constitutes 33% of all solutions. The Regional Bureau for Latin American Countries (RBLAC) and the Regional Bureau for Asia and Pacific (RBAP) closely follow behind at 29% and 28.7% respectively')
+        st.write('By regional distribution, the Regional Bureau for Africa (RBA) leads at 33% with a total of 119 solutions. The Regional Bureau for Latin American Countries (RBLAC) and the Regional Bureau for Asia and Pacific (RBAP) closely follow at 29% and 28.7% respectively')
         # st.write('The Regional Bureau for Latin American Countries (RBLAC) and the Regional Bureau for Asia and Pacific (RBAP) closely follow behind')
 
     fig_region_count = px.bar(
@@ -145,7 +146,7 @@ col_3, col_4 = st.columns(2, gap='medium')
 with col_3:
     col_3_expander = st.expander("Distribution of Solutions Across Energy Sources", expanded=True)
     with col_3_expander:
-        st.write("Lorem Ipsum is simply dummy text of the printing and typesetting industry.")
+        st.write("The Household Application Category is the most dominant energy source. This category includes solutions that address specific energy needs at household level. eg renewable cooking stoves, energy meters, battery packs, etc.")
 
     fig_energy_prevalence = px.bar(
         energy_data,
@@ -161,7 +162,7 @@ with col_3:
 with col_4:
     col_4_expander = st.expander("Distribution of Solutions Across Energy Sources and Regions", expanded=True)
     with col_4_expander:
-        st.write("Lorem Ipsum is simply dummy text of the printing and typesetting industry.")
+        st.write("Accross all regions, the Household Application energy source still continued to dominate. Coming next is the Solar energy source. On the contrary, the Chemical and Wind sources are the least popular sources recorded.")
 
     fig_energy_prevalence = px.bar(
         pd.crosstab(index=energy_data['Region'], columns=energy_data['Energy Source'], normalize='index'),
@@ -169,6 +170,7 @@ with col_4:
         title="<b>Distribution of Solutions Across Energy Sources and Regions</b>",
         width = 450,
         height = 500,
+        barmode = 'stack',
         labels=dict(x='Region', y='No. of Energy Solutions')   # NOT UPDATING AXES LABELS YET
     ).update_layout(default_fig_layout)
     st.plotly_chart(fig_energy_prevalence)
@@ -212,7 +214,7 @@ with col_6:
 
 # ----------FOURTH SECTION----------
 st.markdown('---')
-st.markdown("#### What overall challenges are the solutions addressing or contributing to overcome?")
+# st.markdown("#### What overall challenges are the solutions <br>addressing or contributing to overcome?", unsafe_allow_html=True)
 # Set of Tags across all 5 SDG Solution columns
 thematic_tag_list = ['Thematic Tag1', 'Thematic Tag2', 'Thematic Tag3', 'Thematic Tag4', 'Thematic Tag5']
 list_of_tags = []
@@ -238,8 +240,8 @@ def similar_color(word=None, font_size=None, position=None, orientation=None, fo
 mask = np.array(Image.open(r'mask.png'))
 wordcloud = WordCloud(stopwords=STOPWORDS,
                       mask=mask,
-                      width=mask.shape[1], 
-                      height=mask.shape[0],
+                      width=mask.shape[1]/2, 
+                      height=mask.shape[0]/2,
                      mode='RGBA',
                      background_color='rgba(0,0,0,0)',
                      random_state=42,
@@ -247,13 +249,21 @@ wordcloud = WordCloud(stopwords=STOPWORDS,
 wordcloud.generate(list_of_tags)
 wordcloud = wordcloud.to_file("wordcloud.png")
 
-col_7, col_8, col_9 = st.columns([1,2,1])
+col_7, col_8, col_9 = st.columns([2, 2, 1,], gap='large')
 with col_7:
-    st.empty()
+    st.markdown("#### What overall challenges are the solutions addressing or <br>contributing to overcome?", unsafe_allow_html=True)
+    col_7_expander = st.expander("Overall Challenges solutions address", expanded=True)
+    with col_7_expander:
+        # st.markdown("#### What overall challenges are the solutions addressing or contributing to overcome?")
+        st.write(r"Most solutions are set to address global energy needs by offering sustainable, environmental-friendly and renewable energy options.")
+    
+with col_8:
+    col_8_expander = st.expander("Solutions are set to address general energy needs")
+    # with col_9_expander:
+    st.image('wordcloud.png', output_format='PNG', channels='RGBA')
+
 with col_9:
     st.empty()
-with col_8:
-    st.image('wordcloud.png', output_format='PNG', channels='RGBA')
 
 # ----------FIFTH SECTION----------
 st.markdown('---')
@@ -269,38 +279,56 @@ fig_sdg_solutions = px.bar(sdg_solutions,
         # orientation = 'v'
         ).update_layout(default_fig_layout)
 
-st.plotly_chart(fig_sdg_solutions)
+col_10, col_11, col_12 = st.columns([2, 2, 1], gap='small')
+with col_10:
+    col_10_expander = st.expander("SDGs Advanced by Solutions", expanded=True)
+    with col_10_expander:
+        st.write("Expectedly, SDG 7 (Affordable and Clean Energy) is the most prominent SDG the projects tend to address, followed by SDG 11 (Sustainable Cities and Communities)")
+
+with col_11:
+    st.plotly_chart(fig_sdg_solutions)
+
+with col_12:
+    st.empty()
 
 
 # ----------SIXTH SECTION: Prevalence of Clean Cooking Solutions----------
 st.markdown('---')
 st.markdown("#### Looking at the use case of clean cooking solutions, what is their prevalence, distribution, and source of energy?")
 
+col_13, col_14 = st.columns(2, gap='medium')
+with col_13:
+    col_13_expander = st.expander("Clean Cooking Solutions")
+    with col_13_expander:
+        st.write("Clean cooking solutions are less prevalent generally. Just about 23% of all solutions belong to this category. However, the Regional Bureau for Asia and Pacific(RBAP) offer more clean cooking energy solutions than other regions")
+
 # Prevalence of clean cooking solution
-values = energy_data['Clean Cooking'].value_counts(sort=True)
-names = energy_data['Clean Cooking'].value_counts(sort=True).index
-fig = px.pie(energy_data, values = values, names = names,
-            title='<b>Prevalence of Clean Cooking Solutions</b>',
+    values = energy_data['Clean Cooking'].value_counts(sort=True)
+    names = energy_data['Clean Cooking'].value_counts(sort=True).index
+    fig = px.pie(energy_data, values = values, names = names,
+                title='<b>Prevalence of Clean Cooking Solutions</b>',
+                width = 450,
+            height = 450,
+            # labels=dict(color="Is Clean Cooking Solution")
+            ).update_layout(default_fig_layout)
+
+col_15, col_16 = st.columns(2, gap='small')
+with col_15:
+    st.plotly_chart(fig)
+
+with col_16:
+    # Regional Distribution of Clean Cooking solutions
+    is_clean_cooking = energy_data[energy_data['Clean Cooking'].isin([True])]
+    clean_cooking_region_dist =  is_clean_cooking.groupby(['Clean Cooking', 'Region']).size().reset_index().pivot(columns='Clean Cooking', index='Region', values=0)
+    fig_clean_cooking_region_dist = px.bar(
+            x=is_clean_cooking['Region'].value_counts(sort=False,).index,
+            y=is_clean_cooking['Region'].value_counts(sort=False,),
             width = 450,
-        height = 450,
-        ).update_layout(default_fig_layout)
-
-# pie_col1, pie_col2, pie_col3 = st.columns([1,2,1])
-# with pie_col2:
-st.plotly_chart(fig)
-
-# Regional Distribution of Clean Cooking solutions
-is_clean_cooking = energy_data[energy_data['Clean Cooking'].isin([True])]
-clean_cooking_region_dist =  is_clean_cooking.groupby(['Clean Cooking', 'Region']).size().reset_index().pivot(columns='Clean Cooking', index='Region', values=0)
-fig_clean_cooking_region_dist = px.bar(
-        x=is_clean_cooking['Region'].value_counts(sort=False,).index,
-        y=is_clean_cooking['Region'].value_counts(sort=False,),
-        width = 450,
-        height = 450,
-        title="<b>Distribution of Clean Cooking Solutions Across Regions</b>",
-        labels=dict(x='Region', y='No. of Solutions')
-        ).update_layout(default_fig_layout)
-st.plotly_chart(fig_clean_cooking_region_dist)
+            height = 450,
+            title="<b>Distribution of Clean Cooking Solutions Across Regions</b>",
+            labels=dict(x='Region', y='No. of Solutions')
+            ).update_layout(default_fig_layout)
+    st.plotly_chart(fig_clean_cooking_region_dist)
 
 
 # ----------SEVENTH SECTION: Maps----------
