@@ -89,7 +89,7 @@ default_fig_layout = {
 }
 
 map_layout = {'legend':{'x':0, 'y':0}, 'geo': {'bgcolor':'rgba(0,0,0,0)'}, 
-    'margin':{'r':0, 'l':0, 't':40},
+    'margin':{'r':0, 'l':0, 't':60},
     'width':350, 'height':350,}
 
 config = dict({'displayModeBar': False})
@@ -269,7 +269,7 @@ with col_7:
     col_7_expander = st.expander("Overall Challenges solutions address", expanded=True)
     with col_7_expander:
         # st.markdown("#### What overall challenges are the solutions addressing or contributing to overcome?")
-        st.write(r"Most solutions are set to address global energy needs by offering sustainable, environmental-friendly and renewable energy options.")
+        st.write(r"Most solutions are set to address global energy needs by offering sustainable, environment-friendly and renewable energy options.")
     
 with col_8:
     col_8_expander = st.expander("Solutions are set to address general energy needs")
@@ -357,7 +357,7 @@ fig_ip_distribution.update_geos(showcoastlines = True, showland=True,  landcolor
                showcountries = True, countrycolor='#A49B8C',
                showocean=True, oceancolor='Gray',
                projection = dict(type = 'orthographic'))
-fig_ip_distribution.update_layout(title = '<b>Distribution of IP vs DIY Solutions by Country</b>', title_x=0.5,)
+fig_ip_distribution.update_layout(title = '<b>Distribution of IP vs DIY Solutions <br>by Country</b>', title_x=0.5,)
 fig_ip_distribution.update_layout(map_layout)
 
 with col_17:
