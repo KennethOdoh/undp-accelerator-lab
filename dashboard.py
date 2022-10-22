@@ -12,7 +12,6 @@ from PIL import Image
 # Control Pandas behaviours
 pd.options.mode.chained_assignment = None
 
-# import translators as ts
 
 
 # Page configurations
@@ -22,6 +21,14 @@ st.set_page_config(
     layout = 'wide',
 )
 
+# Hide streamlit style
+hide_st_style = """
+<style>
+    footer{visibility: hidden}
+    #MainMenu {visibility: hidden;}
+    </style>
+"""
+st.markdown(hide_st_style, unsafe_allow_html=True)
 # load data set
 energy_data = pd.read_csv("energy_data_cleaned.csv")
 sdg_solutions = pd.read_csv('sdg-solutions.csv')
@@ -80,9 +87,15 @@ default_fig_layout = {
     'hovermode': 'x unified',
     'dragmode': False,
 }
+
+map_layout = {'legend':{'x':0, 'y':0}, 'geo': {'bgcolor':'rgba(0,0,0,0)'}, 
+    'margin':{'r':0, 'l':0, 't':40},
+    'width':350, 'height':350,}
+
 config = dict({'displayModeBar': False})
 
 # FIRST HORIZONTAL BAR AT THE HOME PAGE
+
 st.markdown("#### UNDP ACCELERATOR LABS NETWORK")
 expander = st.expander('About the Project', expanded=True)
 
@@ -107,7 +120,7 @@ with col_1:
     fig_country_count = px.bar(energy_data, 
         x=energy_data['Country'].value_counts(sort=True, ascending = True),
         y=energy_data['Country'].value_counts(sort=True, ascending = True).index,
-        title="<b>Distribution of Solutions by Country</b>",
+        title="<b>Distribution of Solutions by Country<br>(Tap to Expand)</b>",
         width = 400,
         height = 500,
         range_x=[0, 51],
@@ -167,7 +180,7 @@ with col_4:
         pd.crosstab(index=energy_data['Region'], columns=energy_data['Energy Source'], normalize='index'),
         color_discrete_sequence=px.colors.qualitative.Dark24_r,
         title="<b>Distribution of Solutions Across Energy<br>Sources and Regions</b>",
-        width = 450,
+        width = 400,
         height = 500,
         barmode = 'stack',
         labels=dict(x='Region', y='No. of Energy Solutions')   # NOT UPDATING AXES LABELS YET
@@ -203,7 +216,7 @@ with col_6:
     stacked_bar_chart =  energy_data.groupby(['Clean Cooking', 'Country']).size().reset_index().pivot(columns='Clean Cooking', index='Country', values=0)
     fig_glob_com_clean_cooking_countries = px.bar(
             stacked_bar_chart,
-            width = 500,
+            width = 400,
             height = 900,
             orientation='h',
             title="<b>Distribution of Clean Cooking Solutions<br>Across Countries</b>"
@@ -274,7 +287,7 @@ fig_sdg_solutions = px.bar(sdg_solutions,
         y=sdg_solutions['SDG Solution'].value_counts(sort=False,),
         x=sdg_solutions['SDG Solution'].value_counts(sort=False,).index,
         title="<b>Distribution of Solutions Across The 17 SDGs</b>",
-        width = 450,
+        width = 400,
         height = 500,
         labels=dict(x='Sustainable Development Goal', y='No. of solutions addressing the SDG')
         # orientation = 'v'
@@ -312,7 +325,7 @@ with col_13:
                 width = 400,
             height = 400,
             # labels=dict(color="Is Clean Cooking Solution")
-            ).update_layout(default_fig_layout)
+            ).update_layout(map_layout)
 
 col_15, col_16 = st.columns(2, gap='small')
 with col_15:
@@ -337,7 +350,7 @@ with col_16:
 st.markdown('---')
 # st.markdown("#### How can we display the more quantitative information (ratio of IP vs DIY solutions; Prototype vs Product) in an appealing way that signifies the availability of solutions in country? (if applicable)")
 
-col_17, col_18 = st.columns(2, gap="small")
+col_17, col_18, col_19 = st.columns([2, 1, 2], gap="small")
 fig_ip_distribution = px.scatter_geo(energy_data,lat='Lat',lon='Long', hover_name="Country", color='Intellectual Property')
 
 fig_ip_distribution.update_geos(showcoastlines = True, showland=True,  landcolor='#FBF8F3',
@@ -345,7 +358,7 @@ fig_ip_distribution.update_geos(showcoastlines = True, showland=True,  landcolor
                showocean=True, oceancolor='Gray',
                projection = dict(type = 'orthographic'))
 fig_ip_distribution.update_layout(title = '<b>Distribution of IP vs DIY Solutions by Country</b>', title_x=0.5,)
-fig_ip_distribution.update_layout(legend=dict(y=0.9, x=0))
+fig_ip_distribution.update_layout(map_layout)
 
 with col_17:
     st.markdown("#### Ratio of IP vs DIY solutions per Country")
@@ -362,10 +375,10 @@ fig_sol_stage_distribution.update_geos(showcoastlines = True, showland=True,  la
                showocean=True, oceancolor='Gray',
                projection = dict(type = 'orthographic',))
 # fig_sol_stage_distribution.update_layout(default_fig_layout)
-fig_sol_stage_distribution.update_layout(
-    legend=dict(y=0.9, x=0)
-)
-
+fig_sol_stage_distribution.update_layout(map_layout)
 with col_18:
+    st.empty()
+
+with col_19:
     st.markdown("#### Ratio of **Prototype** vs **Product** per Country")
     st.plotly_chart(fig_sol_stage_distribution, **{'config': config})
