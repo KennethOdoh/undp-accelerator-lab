@@ -81,7 +81,9 @@ default_fig_layout = {
     'yaxis':{'showgrid': False,},
     'title_x': 0.5,
     'hovermode': 'x unified',
+    'dragmode': False,
 }
+config = dict({'displayModeBar': False})
 
 # FIRST HORIZONTAL BAR AT THE HOME PAGE
 st.markdown("#### UNDP ACCELERATOR LABS NETWORK")
@@ -109,13 +111,13 @@ with col_1:
         x=energy_data['Country'].value_counts(sort=True, ascending = True),
         y=energy_data['Country'].value_counts(sort=True, ascending = True).index,
         title="<b>Distribution of Solutions by Country</b>",
-        width = 450,
+        width = 400,
         height = 500,
         range_x=[0, 51],
         range_y=[28, 48],
         labels=dict(x = 'No. of Solutions', y='Country')
     ).update_layout(default_fig_layout).update_yaxes(tickangle =  -45)
-    st.plotly_chart(fig_country_count, use_container_width=False)   #TODO: Country label not properly displayed
+    st.plotly_chart(fig_country_count, use_container_width=False, **{'config': config})   #TODO: Country label not properly displayed
 
 
 with col_2:
@@ -129,11 +131,11 @@ with col_2:
         x = energy_data['Region'].value_counts(sort=True, ascending = True),
         y=energy_data['Region'].value_counts(sort=True, ascending = True).index,
         title="<b>Distribution of Solutions by Region</b>",
-        width = 450,
-        height = 400,
+        width = 400,
+        height = 450,
         labels=dict(x='No. of Solutions', y='Region'),
     ).update_layout(default_fig_layout)
-    st.plotly_chart(fig_region_count, use_container_width=False)
+    st.plotly_chart(fig_region_count, use_container_width=False, **{'config': config})
 
 
 #------------ SECOND SECTION------------------
@@ -152,12 +154,12 @@ with col_3:
         energy_data,
         x=energy_data['Energy Source'].value_counts(sort=True, ascending = True),
         y=energy_data['Energy Source'].value_counts(sort=True, ascending = True).index,
-        title="<b>Distribution of Solutions Across Energy Sources</b>",
-        width = 480,
+        title="<b>Distribution of Solutions Across<br>Energy Sources</b>",
+        width = 400,
         height = 500,
         labels=dict(x='No. of Solutions', y='Energy Source',)
     ).update_layout(default_fig_layout).update_yaxes(tickangle =  -55)
-    st.plotly_chart(fig_energy_prevalence)
+    st.plotly_chart(fig_energy_prevalence, **{'config': config})
 
 with col_4:
     col_4_expander = st.expander("Distribution of Solutions Across Energy Sources and Regions", expanded=True)
@@ -167,13 +169,13 @@ with col_4:
     fig_energy_prevalence = px.bar(
         pd.crosstab(index=energy_data['Region'], columns=energy_data['Energy Source'], normalize='index'),
         color_discrete_sequence=px.colors.qualitative.Dark24_r,
-        title="<b>Distribution of Solutions Across Energy Sources and Regions</b>",
+        title="<b>Distribution of Solutions Across Energy<br>Sources and Regions</b>",
         width = 450,
         height = 500,
         barmode = 'stack',
         labels=dict(x='Region', y='No. of Energy Solutions')   # NOT UPDATING AXES LABELS YET
     ).update_layout(default_fig_layout)
-    st.plotly_chart(fig_energy_prevalence)
+    st.plotly_chart(fig_energy_prevalence, **{'config': config})
 
 
 
@@ -191,11 +193,11 @@ with col_5:
     stacked_bar_chart = energy_data.groupby(['Clean Cooking', 'Region']).size().reset_index().pivot(columns='Clean Cooking', index='Region', values=0)
     fig_glob_com_clean_cooking_regions = px.bar(
         stacked_bar_chart,
-        title="<b>Global Spread of Clean Cooking Solutions</b>",
+        title="<b>Global Spread of Clean Cooking<br>Solutions</b>",
         width = 400,
         height = 400,
-        ).update_layout(default_fig_layout)
-    st.plotly_chart(fig_glob_com_clean_cooking_regions)
+        ).update_layout(default_fig_layout, legend=dict(x=0.95))
+    st.plotly_chart(fig_glob_com_clean_cooking_regions, **{'config':config})
     
 with col_6:
     col_6_expander = st.expander("Case Study: Clean Cooking Solutions", expanded=True)
@@ -207,9 +209,11 @@ with col_6:
             width = 500,
             height = 900,
             orientation='h',
+            title="<b>Distribution of Clean Cooking Solutions<br>Across Countries</b>"
             # barmode='group',
         ).update_layout(default_fig_layout).update_yaxes(tickangle =  -45)
-    st.plotly_chart(fig_glob_com_clean_cooking_countries)
+    fig_glob_com_clean_cooking_countries.update_layout(legend=dict(x=0.5))
+    st.plotly_chart(fig_glob_com_clean_cooking_countries, **{'config': config})
 
 
 # ----------FOURTH SECTION----------
@@ -283,10 +287,11 @@ col_10, col_11, col_12 = st.columns([2, 2, 1], gap='small')
 with col_10:
     col_10_expander = st.expander("SDGs Advanced by Solutions", expanded=True)
     with col_10_expander:
-        st.write("Expectedly, SDG 7 (Affordable and Clean Energy) is the most prominent SDG the projects tend to address, followed by SDG 11 (Sustainable Cities and Communities)")
+        st.write("Expectedly, SDG 7 (Affordable and Clean Energy) is the most prominent SDG the projects tend to address, followed by SDG 11 (Sustainable Cities and Communities).")
+        st.write("Most solutions are proposing a cleaner and more sustainable energy solutions.")
 
 with col_11:
-    st.plotly_chart(fig_sdg_solutions)
+    st.plotly_chart(fig_sdg_solutions, **{'config': config})
 
 with col_12:
     st.empty()
@@ -294,11 +299,11 @@ with col_12:
 
 # ----------SIXTH SECTION: Prevalence of Clean Cooking Solutions----------
 st.markdown('---')
-st.markdown("#### Looking at the use case of clean cooking solutions, what is their prevalence, distribution, and source of energy?")
+st.markdown("#### Prevalence of Clean Cooking solutions")
 
 col_13, col_14 = st.columns(2, gap='medium')
 with col_13:
-    col_13_expander = st.expander("Clean Cooking Solutions")
+    col_13_expander = st.expander("Clean Cooking Solutions", expanded=True)
     with col_13_expander:
         st.write("Clean cooking solutions are less prevalent generally. Just about 23% of all solutions belong to this category. However, the Regional Bureau for Asia and Pacific(RBAP) offer more clean cooking energy solutions than other regions")
 
@@ -307,14 +312,14 @@ with col_13:
     names = energy_data['Clean Cooking'].value_counts(sort=True).index
     fig = px.pie(energy_data, values = values, names = names,
                 title='<b>Prevalence of Clean Cooking Solutions</b>',
-                width = 450,
-            height = 450,
+                width = 400,
+            height = 400,
             # labels=dict(color="Is Clean Cooking Solution")
             ).update_layout(default_fig_layout)
 
 col_15, col_16 = st.columns(2, gap='small')
 with col_15:
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, **{'config': config})
 
 with col_16:
     # Regional Distribution of Clean Cooking solutions
@@ -323,17 +328,19 @@ with col_16:
     fig_clean_cooking_region_dist = px.bar(
             x=is_clean_cooking['Region'].value_counts(sort=False,).index,
             y=is_clean_cooking['Region'].value_counts(sort=False,),
-            width = 450,
-            height = 450,
-            title="<b>Distribution of Clean Cooking Solutions Across Regions</b>",
+            width = 400,
+            height = 400,
+            title="<b>Distribution of Clean Cooking Solutions <br> Across Regions</b>",
             labels=dict(x='Region', y='No. of Solutions')
             ).update_layout(default_fig_layout)
-    st.plotly_chart(fig_clean_cooking_region_dist)
+    st.plotly_chart(fig_clean_cooking_region_dist, **{'config': config})
 
 
 # ----------SEVENTH SECTION: Maps----------
 st.markdown('---')
-st.markdown("#### How can we display the more quantitative information (ratio of IP vs DIY solutions; Prototype vs Product) in an appealing way that signifies the availability of solutions in country? (if applicable)")
+# st.markdown("#### How can we display the more quantitative information (ratio of IP vs DIY solutions; Prototype vs Product) in an appealing way that signifies the availability of solutions in country? (if applicable)")
+
+col_17, col_18 = st.columns(2, gap="small")
 fig_ip_distribution = px.scatter_geo(energy_data,lat='Lat',lon='Long', hover_name="Country", color='Intellectual Property')
 
 fig_ip_distribution.update_geos(showcoastlines = True, showland=True,  landcolor='#FBF8F3',
@@ -341,7 +348,11 @@ fig_ip_distribution.update_geos(showcoastlines = True, showland=True,  landcolor
                showocean=True, oceancolor='Gray',
                projection = dict(type = 'orthographic'))
 fig_ip_distribution.update_layout(title = '<b>Distribution of IP vs DIY Solutions by Country</b>', title_x=0.5,)
-st.plotly_chart(fig_ip_distribution)
+fig_ip_distribution.update_layout(legend=dict(y=0.9, x=0))
+
+with col_17:
+    st.markdown("#### Ratio of IP vs DIY solutions per Country")
+    st.plotly_chart(fig_ip_distribution, **{'config': config})
 
 fig_sol_stage_distribution = px.scatter_geo(energy_data,lat='Lat',lon='Long', 
 hover_name="Country", 
@@ -353,5 +364,11 @@ fig_sol_stage_distribution.update_geos(showcoastlines = True, showland=True,  la
                 showcountries = True, countrycolor='#A49B8C',
                showocean=True, oceancolor='Gray',
                projection = dict(type = 'orthographic',))
-fig_sol_stage_distribution.update_layout(default_fig_layout)
-st.plotly_chart(fig_sol_stage_distribution)
+# fig_sol_stage_distribution.update_layout(default_fig_layout)
+fig_sol_stage_distribution.update_layout(
+    legend=dict(y=0.9, x=0)
+)
+
+with col_18:
+    st.markdown("#### Ratio of **Prototype** vs **Product** per Country")
+    st.plotly_chart(fig_sol_stage_distribution, **{'config': config})
