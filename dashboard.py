@@ -1,4 +1,5 @@
 # Importing Packages
+from cProfile import label
 from inspect import stack
 import numpy as np
 import pandas as pd
@@ -88,8 +89,8 @@ expander = st.expander('About the Project', expanded=True)
 with expander:
     st.write(r"UNDP’s Strategic Plan (2022 – 2025) sets out the ambitious objective to increase access to clean and affordable energy for 500 million people by speeding up investment in distributed renewable energy solutions, especially for those hardest to reach and in crisis context.")
     st.write(r"While large grid and financial flows at scale are essential to reach this goal, our Discover and Deploy Solutions Mapping campaign will explore bottom-up, lead user, frugal and grassroots innovations as a contribution to the sustainable energy access moonshot.")
-    st.write("Over the course of 4 months, our network of solutions mappers has discovered 359 grassroots energy solutions from across different regions, demographics and energy sources. The discovered solutions help us to signify the importance of already existing grassroots solutions to energy conservation, augmentation, generation, storage, and distribution in early-stage use. Albeit these are often not yet distributed at scale their existence offers valuable insights and trends on how communities are overcoming their own challenges.")
-    st.write("We need to acknowledge the ingenuity and problem solving capacity found in many communities that in turn can feed into UNDP's programming and contribute to achieving UNDP’s ambitious mission moonshot.")
+    st.write(r"Over the course of 4 months, our network of solutions mappers has discovered 359 grassroots energy solutions from across different regions, demographics and energy sources. The discovered solutions help us to signify the importance of already existing grassroots solutions to energy conservation, augmentation, generation, storage, and distribution in early-stage use. Albeit these are often not yet distributed at scale their existence offers valuable insights and trends on how communities are overcoming their own challenges.")
+    st.write(r"We need to acknowledge the ingenuity and problem solving capacity found in many communities that in turn can feed into UNDP's programming and contribute to achieving UNDP’s ambitious mission moonshot.")
     
 
 
@@ -101,7 +102,7 @@ col_1, col_2 = st.columns(2, gap='small')
 with col_1:
     col_1_expander = st.expander("Distribution of Solution per Country", expanded=True)
     with col_1_expander:
-        st.write("Lorem Ipsum is simply dummy text of the printing and typesetting industry.")
+        st.write("14% of all Energy solutions came from India alone, making it the country with the highest number of solutions (51). Panama comes next at 8% and Argentina at 7.5% (i.e 28 and 27 solutions respectively).")
 
     fig_country_count = px.bar(energy_data, 
         x=energy_data['Country'].value_counts(sort=True, ascending = True),
@@ -110,15 +111,17 @@ with col_1:
         width = 450,
         height = 500,
         range_x=[0, 51],
-        range_y=[28, 48]
+        range_y=[28, 48],
+        labels=dict(x = 'No. of Solutions', y='Country')
     ).update_layout(default_fig_layout).update_yaxes(tickangle =  -45)
-
     st.plotly_chart(fig_country_count, use_container_width=False)   #TODO: Country label not properly displayed
+
 
 with col_2:
     col_2_expander = st.expander('Distribution of Solutions Per Region', expanded=True)
     with col_2_expander:
-        st.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry.')
+        st.write('By regional destribution, the Regional Bureau for Africa (RBA) constitutes 33% of all solutions. The Regional Bureau for Latin American Countries (RBLAC) and the Regional Bureau for Asia and Pacific (RBAP) closely follow behind at 29% and 28.7% respectively')
+        # st.write('The Regional Bureau for Latin American Countries (RBLAC) and the Regional Bureau for Asia and Pacific (RBAP) closely follow behind')
 
     fig_region_count = px.bar(
         energy_data,
@@ -127,6 +130,7 @@ with col_2:
         title="<b>Distribution of Solutions by Region</b>",
         width = 450,
         height = 400,
+        labels=dict(x='No. of Solutions', y='Region'),
     ).update_layout(default_fig_layout)
     st.plotly_chart(fig_region_count, use_container_width=False)
 
@@ -150,6 +154,7 @@ with col_3:
         title="<b>Distribution of Solutions Across Energy Sources</b>",
         width = 480,
         height = 500,
+        labels=dict(x='No. of Solutions', y='Energy Source',)
     ).update_layout(default_fig_layout).update_yaxes(tickangle =  -55)
     st.plotly_chart(fig_energy_prevalence)
 
@@ -164,6 +169,7 @@ with col_4:
         title="<b>Distribution of Solutions Across Energy Sources and Regions</b>",
         width = 450,
         height = 500,
+        labels=dict(x='Region', y='No. of Energy Solutions')   # NOT UPDATING AXES LABELS YET
     ).update_layout(default_fig_layout)
     st.plotly_chart(fig_energy_prevalence)
 
@@ -206,7 +212,7 @@ with col_6:
 
 # ----------FOURTH SECTION----------
 st.markdown('---')
-st.markdown("#### What overall challenges are the solutions addressing or contributing to overcome?")    #TODO: ANSWERS TO THIS SECTION SHALL BE PROVIDED BY NANCY
+st.markdown("#### What overall challenges are the solutions addressing or contributing to overcome?")
 # Set of Tags across all 5 SDG Solution columns
 thematic_tag_list = ['Thematic Tag1', 'Thematic Tag2', 'Thematic Tag3', 'Thematic Tag4', 'Thematic Tag5']
 list_of_tags = []
@@ -259,6 +265,7 @@ fig_sdg_solutions = px.bar(sdg_solutions,
         title="<b>Distribution of Solutions Across The 17 SDGs</b>",
         width = 450,
         height = 500,
+        labels=dict(x='Sustainable Development Goal', y='No. of solutions addressing the SDG')
         # orientation = 'v'
         ).update_layout(default_fig_layout)
 
@@ -288,8 +295,10 @@ clean_cooking_region_dist =  is_clean_cooking.groupby(['Clean Cooking', 'Region'
 fig_clean_cooking_region_dist = px.bar(
         x=is_clean_cooking['Region'].value_counts(sort=False,).index,
         y=is_clean_cooking['Region'].value_counts(sort=False,),
-        # width = 500,
-        # height = 900
+        width = 450,
+        height = 450,
+        title="<b>Distribution of Clean Cooking Solutions Across Regions</b>",
+        labels=dict(x='Region', y='No. of Solutions')
         ).update_layout(default_fig_layout)
 st.plotly_chart(fig_clean_cooking_region_dist)
 
@@ -300,16 +309,21 @@ st.markdown("#### How can we display the more quantitative information (ratio of
 fig_ip_distribution = px.scatter_geo(energy_data,lat='Lat',lon='Long', hover_name="Country", color='Intellectual Property')
 
 fig_ip_distribution.update_geos(showcoastlines = True, showland=True,  landcolor='#FBF8F3',
-                showcountries = True, countrycolor='#A49B8C',
+               showcountries = True, countrycolor='#A49B8C',
                showocean=True, oceancolor='Gray',
                projection = dict(type = 'orthographic'))
-fig_ip_distribution.update_layout(title = 'Distribution of IP vs DIY Solutions by Country', title_x=0.45,)
+fig_ip_distribution.update_layout(title = '<b>Distribution of IP vs DIY Solutions by Country</b>', title_x=0.5,)
 st.plotly_chart(fig_ip_distribution)
 
-fig_sol_stage_distribution = px.scatter_geo(energy_data,lat='Lat',lon='Long', hover_name="Country", color='Intellectual Property')
+fig_sol_stage_distribution = px.scatter_geo(energy_data,lat='Lat',lon='Long', 
+hover_name="Country", 
+title = '<b>Distribution of Solutions by Project Stage</b>',
+color='Project Stage',
+)
 
 fig_sol_stage_distribution.update_geos(showcoastlines = True, showland=True,  landcolor='#FBF8F3',
                 showcountries = True, countrycolor='#A49B8C',
                showocean=True, oceancolor='Gray',
                projection = dict(type = 'orthographic',))
-fig_sol_stage_distribution.update_layout(title = 'Distribution of IP vs DIY Solutions by Country', title_x=0.45,)
+fig_sol_stage_distribution.update_layout(default_fig_layout)
+st.plotly_chart(fig_sol_stage_distribution)
